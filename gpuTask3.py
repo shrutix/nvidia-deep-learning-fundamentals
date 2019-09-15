@@ -1,5 +1,5 @@
 
-MODEL_JOB_DIR = '/dli/data/digits/20180301-185638-e918'  ## Remember to set this to be the job directory for your model
+MODEL_JOB_DIR = '/dli/data/digits/20180301-185638-e918' 
 get_ipython().system(u'ls $MODEL_JOB_DIR')
 
 ARCHITECTURE = MODEL_JOB_DIR + '/' + 'deploy.prototxt'
