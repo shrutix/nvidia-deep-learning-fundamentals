@@ -1,0 +1,1449 @@
+I0922 22:53:48.420708   169 caffe.cpp:680] This is NVCaffe 0.17.0 started at Sun Sep 22 22:53:48 2019
+I0922 22:53:48.420912   169 caffe.cpp:682] CuDNN version: 7102
+I0922 22:53:48.420917   169 caffe.cpp:683] CuBLAS version: 9000
+I0922 22:53:48.420922   169 caffe.cpp:684] CUDA version: 9000
+I0922 22:53:48.420925   169 caffe.cpp:685] CUDA driver version: 9020
+I0922 22:53:48.420933   169 caffe.cpp:686] Arguments:
+[0]: /usr/local/bin/caffe
+[1]: train
+[2]: --solver=/dli/data/digits/20190922-225346-d93f/solver.prototxt
+[3]: --gpu=0
+I0922 22:53:48.437039   169 upgrade_proto.cpp:1044] Attempting to upgrade input file specified using deprecated 'solver_type' field (enum)': /dli/data/digits/20190922-225346-d93f/solver.prototxt
+I0922 22:53:48.437067   169 upgrade_proto.cpp:1051] Successfully upgraded file specified using deprecated 'solver_type' field (enum) to 'type' field (string).
+W0922 22:53:48.437072   169 upgrade_proto.cpp:1053] Note that future Caffe releases will only support 'type' field (string) for a solver's type.
+I0922 22:53:48.453513   169 gpu_memory.cpp:105] GPUMemory::Manager initialized
+I0922 22:53:48.454016   169 gpu_memory.cpp:107] Total memory: 11996954624, Free: 11769413632, dev_info[0]: total=11996954624 free=11769413632
+I0922 22:53:48.454025   169 caffe.cpp:222] Using GPUs 0
+I0922 22:53:48.454296   169 caffe.cpp:226] GPU 0: Tesla K80
+I0922 22:53:48.454357   169 solver.cpp:40] Solver data type: FLOAT
+I0922 22:53:48.463224   169 solver.cpp:43] Initializing solver from parameters:
+test_iter: 71
+test_interval: 54
+base_lr: 0.01
+display: 6
+max_iter: 270
+lr_policy: "step"
+gamma: 0.1
+momentum: 0.9
+weight_decay: 0.0001
+stepsize: 90
+snapshot: 54
+snapshot_prefix: "snapshot"
+solver_mode: GPU
+device_id: 0
+net: "train_val.prototxt"
+train_state {
+level: 0
+stage: ""
+}
+type: "SGD"
+store_blobs_in_old_format: false
+I0922 22:53:48.463320   169 solver.cpp:84] Creating training net from net file: train_val.prototxt
+I0922 22:53:48.463697   169 net.cpp:456] The NetState phase (0) differed from the phase (1) specified by a rule in layer val-data
+I0922 22:53:48.463722   169 net.cpp:456] The NetState phase (0) differed from the phase (1) specified by a rule in layer accuracy
+I0922 22:53:48.463889   169 net.cpp:79] Initializing net from parameters:
+state {
+phase: TRAIN
+level: 0
+stage: ""
+}
+layer {
+name: "train-data"
+type: "Data"
+top: "data"
+top: "label"
+include {
+phase: TRAIN
+}
+transform_param {
+mirror: true
+crop_size: 227
+mean_file: "/dli/data/digits/20190922-225123-167e/mean.binaryproto"
+}
+data_param {
+source: "/dli/data/digits/20190922-225123-167e/train_db"
+batch_size: 128
+backend: LMDB
+}
+}
+layer {
+name: "conv1"
+type: "Convolution"
+bottom: "data"
+top: "conv1"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+convolution_param {
+num_output: 96
+kernel_size: 11
+stride: 4
+weight_filler {
+type: "gaussian"
+std: 0.01
+}
+bias_filler {
+type: "constant"
+value: 0
+}
+}
+}
+layer {
+name: "relu1"
+type: "ReLU"
+bottom: "conv1"
+top: "conv1"
+}
+layer {
+name: "norm1"
+type: "LRN"
+bottom: "conv1"
+top: "norm1"
+lrn_param {
+local_size: 5
+alpha: 0.0001
+beta: 0.75
+}
+}
+layer {
+name: "pool1"
+type: "Pooling"
+bottom: "norm1"
+top: "pool1"
+pooling_param {
+pool: MAX
+kernel_size: 3
+stride: 2
+}
+}
+layer {
+name: "conv2"
+type: "Convolution"
+bottom: "pool1"
+top: "conv2"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+convolution_param {
+num_output: 256
+pad: 2
+kernel_size: 5
+group: 2
+weight_filler {
+type: "gaussian"
+std: 0.01
+}
+bias_filler {
+type: "constant"
+value: 0.1
+}
+}
+}
+layer {
+name: "relu2"
+type: "ReLU"
+bottom: "conv2"
+top: "conv2"
+}
+layer {
+name: "norm2"
+type: "LRN"
+bottom: "conv2"
+top: "norm2"
+lrn_param {
+local_size: 5
+alpha: 0.0001
+beta: 0.75
+}
+}
+layer {
+name: "pool2"
+type: "Pooling"
+bottom: "norm2"
+top: "pool2"
+pooling_param {
+pool: MAX
+kernel_size: 3
+stride: 2
+}
+}
+layer {
+name: "conv3"
+type: "Convolution"
+bottom: "pool2"
+top: "conv3"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+convolution_param {
+num_output: 384
+pad: 1
+kernel_size: 3
+weight_filler {
+type: "gaussian"
+std: 0.01
+}
+bias_filler {
+type: "constant"
+value: 0
+}
+}
+}
+layer {
+name: "relu3"
+type: "ReLU"
+bottom: "conv3"
+top: "conv3"
+}
+layer {
+name: "conv4"
+type: "Convolution"
+bottom: "conv3"
+top: "conv4"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+convolution_param {
+num_output: 384
+pad: 1
+kernel_size: 3
+group: 2
+weight_filler {
+type: "gaussian"
+std: 0.01
+}
+bias_filler {
+type: "constant"
+value: 0.1
+}
+}
+}
+layer {
+name: "relu4"
+type: "ReLU"
+bottom: "conv4"
+top: "conv4"
+}
+layer {
+name: "conv5"
+type: "Convolution"
+bottom: "conv4"
+top: "conv5"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+convolution_param {
+num_output: 256
+pad: 1
+kernel_size: 3
+group: 2
+weight_filler {
+type: "gaussian"
+std: 0.01
+}
+bias_filler {
+type: "constant"
+value: 0.1
+}
+}
+}
+layer {
+name: "relu5"
+type: "ReLU"
+bottom: "conv5"
+top: "conv5"
+}
+layer {
+name: "pool5"
+type: "Pooling"
+bottom: "conv5"
+top: "pool5"
+pooling_param {
+pool: MAX
+kernel_size: 3
+stride: 2
+}
+}
+layer {
+name: "fc6"
+type: "InnerProduct"
+bottom: "pool5"
+top: "fc6"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+inner_product_param {
+num_output: 4096
+weight_filler {
+type: "gaussian"
+std: 0.005
+}
+bias_filler {
+type: "constant"
+value: 0.1
+}
+}
+}
+layer {
+name: "relu6"
+type: "ReLU"
+bottom: "fc6"
+top: "fc6"
+}
+layer {
+name: "drop6"
+type: "Dropout"
+bottom: "fc6"
+top: "fc6"
+dropout_param {
+dropout_ratio: 0.5
+}
+}
+layer {
+name: "fc7"
+type: "InnerProduct"
+bottom: "fc6"
+top: "fc7"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+inner_product_param {
+num_output: 4096
+weight_filler {
+type: "gaussian"
+std: 0.005
+}
+bias_filler {
+type: "constant"
+value: 0.1
+}
+}
+}
+layer {
+name: "relu7"
+type: "ReLU"
+bottom: "fc7"
+top: "fc7"
+}
+layer {
+name: "drop7"
+type: "Dropout"
+bottom: "fc7"
+top: "fc7"
+dropout_param {
+dropout_ratio: 0.5
+}
+}
+layer {
+name: "fc8"
+type: "InnerProduct"
+bottom: "fc7"
+top: "fc8"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+inner_product_param {
+num_output: 2
+weight_filler {
+type: "gaussian"
+std: 0.01
+}
+bias_filler {
+type: "constant"
+value: 0
+}
+}
+}
+layer {
+name: "loss"
+type: "SoftmaxWithLoss"
+bottom: "fc8"
+bottom: "label"
+top: "loss"
+}
+I0922 22:53:48.464007   169 net.cpp:109] Using FLOAT as default forward math type
+I0922 22:53:48.464017   169 net.cpp:115] Using FLOAT as default backward math type
+I0922 22:53:48.464026   169 layer_factory.hpp:172] Creating layer 'train-data' of type 'Data'
+I0922 22:53:48.464032   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:48.464416   169 internal_thread.cpp:19] Starting 1 internal thread(s) on device 0
+I0922 22:53:48.464498   169 data_transformer.cpp:40] Loading mean file from: /dli/data/digits/20190922-225123-167e/mean.binaryproto
+I0922 22:53:48.465237   175 blocking_queue.cpp:40] Data layer prefetch queue empty
+I0922 22:53:48.470423   169 data_transformer.cpp:40] Loading mean file from: /dli/data/digits/20190922-225123-167e/mean.binaryproto
+I0922 22:53:48.475064   169 net.cpp:199] Created Layer train-data (0)
+I0922 22:53:48.475077   169 net.cpp:541] train-data -> data
+I0922 22:53:48.475109   169 net.cpp:541] train-data -> label
+I0922 22:53:48.475127   169 data_reader.cpp:58] Sample Data Reader threads: 1, out queues: 1, depth: 128
+I0922 22:53:48.475178   169 internal_thread.cpp:19] Starting 1 internal thread(s) on device 0
+I0922 22:53:48.475936   176 db_lmdb.cpp:36] Opened lmdb /dli/data/digits/20190922-225123-167e/train_db
+I0922 22:53:48.477906   169 data_layer.cpp:199] [0] Output data size: 128, 3, 227, 227
+I0922 22:53:48.477921   169 data_transformer.cpp:40] Loading mean file from: /dli/data/digits/20190922-225123-167e/mean.binaryproto
+I0922 22:53:48.482744   169 data_transformer.cpp:40] Loading mean file from: /dli/data/digits/20190922-225123-167e/mean.binaryproto
+I0922 22:53:48.490578   169 internal_thread.cpp:19] Starting 1 internal thread(s) on device 0
+I0922 22:53:48.490662   169 net.cpp:259] Setting up train-data
+I0922 22:53:48.491333   169 net.cpp:266] TRAIN Top shape for layer 0 'train-data' 128 3 227 227 (19787136)
+I0922 22:53:48.491355   169 net.cpp:266] TRAIN Top shape for layer 0 'train-data' 128 (128)
+I0922 22:53:48.491370   169 layer_factory.hpp:172] Creating layer 'conv1' of type 'Convolution'
+I0922 22:53:48.491384   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:48.491430   169 net.cpp:199] Created Layer conv1 (1)
+I0922 22:53:48.491444   169 net.cpp:571] conv1 <- data
+I0922 22:53:48.491462   169 net.cpp:541] conv1 -> conv1
+I0922 22:53:49.002701   169 net.cpp:259] Setting up conv1
+I0922 22:53:49.002737   169 net.cpp:266] TRAIN Top shape for layer 1 'conv1' 128 96 55 55 (37171200)
+I0922 22:53:49.002761   169 layer_factory.hpp:172] Creating layer 'relu1' of type 'ReLU'
+I0922 22:53:49.002770   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.002784   169 net.cpp:199] Created Layer relu1 (2)
+I0922 22:53:49.002791   169 net.cpp:571] relu1 <- conv1
+I0922 22:53:49.002799   169 net.cpp:526] relu1 -> conv1 (in-place)
+I0922 22:53:49.002825   169 net.cpp:259] Setting up relu1
+I0922 22:53:49.002832   169 net.cpp:266] TRAIN Top shape for layer 2 'relu1' 128 96 55 55 (37171200)
+I0922 22:53:49.002838   169 layer_factory.hpp:172] Creating layer 'norm1' of type 'LRN'
+I0922 22:53:49.002844   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.002864   169 net.cpp:199] Created Layer norm1 (3)
+I0922 22:53:49.002871   169 net.cpp:571] norm1 <- conv1
+I0922 22:53:49.002876   169 net.cpp:541] norm1 -> norm1
+I0922 22:53:49.002940   169 net.cpp:259] Setting up norm1
+I0922 22:53:49.002948   169 net.cpp:266] TRAIN Top shape for layer 3 'norm1' 128 96 55 55 (37171200)
+I0922 22:53:49.002954   169 layer_factory.hpp:172] Creating layer 'pool1' of type 'Pooling'
+I0922 22:53:49.002960   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.002972   169 net.cpp:199] Created Layer pool1 (4)
+I0922 22:53:49.002977   169 net.cpp:571] pool1 <- norm1
+I0922 22:53:49.002985   169 net.cpp:541] pool1 -> pool1
+I0922 22:53:49.003048   169 net.cpp:259] Setting up pool1
+I0922 22:53:49.003057   169 net.cpp:266] TRAIN Top shape for layer 4 'pool1' 128 96 27 27 (8957952)
+I0922 22:53:49.003063   169 layer_factory.hpp:172] Creating layer 'conv2' of type 'Convolution'
+I0922 22:53:49.003069   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.003085   169 net.cpp:199] Created Layer conv2 (5)
+I0922 22:53:49.003090   169 net.cpp:571] conv2 <- pool1
+I0922 22:53:49.003095   169 net.cpp:541] conv2 -> conv2
+I0922 22:53:49.009953   169 net.cpp:259] Setting up conv2
+I0922 22:53:49.009968   169 net.cpp:266] TRAIN Top shape for layer 5 'conv2' 128 256 27 27 (23887872)
+I0922 22:53:49.009980   169 layer_factory.hpp:172] Creating layer 'relu2' of type 'ReLU'
+I0922 22:53:49.009986   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.009995   169 net.cpp:199] Created Layer relu2 (6)
+I0922 22:53:49.010000   169 net.cpp:571] relu2 <- conv2
+I0922 22:53:49.010006   169 net.cpp:526] relu2 -> conv2 (in-place)
+I0922 22:53:49.010015   169 net.cpp:259] Setting up relu2
+I0922 22:53:49.010044   169 net.cpp:266] TRAIN Top shape for layer 6 'relu2' 128 256 27 27 (23887872)
+I0922 22:53:49.010051   169 layer_factory.hpp:172] Creating layer 'norm2' of type 'LRN'
+I0922 22:53:49.010056   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.010066   169 net.cpp:199] Created Layer norm2 (7)
+I0922 22:53:49.010071   169 net.cpp:571] norm2 <- conv2
+I0922 22:53:49.010076   169 net.cpp:541] norm2 -> norm2
+I0922 22:53:49.010164   169 net.cpp:259] Setting up norm2
+I0922 22:53:49.010180   169 net.cpp:266] TRAIN Top shape for layer 7 'norm2' 128 256 27 27 (23887872)
+I0922 22:53:49.010190   169 layer_factory.hpp:172] Creating layer 'pool2' of type 'Pooling'
+I0922 22:53:49.010198   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.010211   169 net.cpp:199] Created Layer pool2 (8)
+I0922 22:53:49.010219   169 net.cpp:571] pool2 <- norm2
+I0922 22:53:49.010228   169 net.cpp:541] pool2 -> pool2
+I0922 22:53:49.010295   169 net.cpp:259] Setting up pool2
+I0922 22:53:49.010304   169 net.cpp:266] TRAIN Top shape for layer 8 'pool2' 128 256 13 13 (5537792)
+I0922 22:53:49.010310   169 layer_factory.hpp:172] Creating layer 'conv3' of type 'Convolution'
+I0922 22:53:49.010316   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.010330   169 net.cpp:199] Created Layer conv3 (9)
+I0922 22:53:49.010336   169 net.cpp:571] conv3 <- pool2
+I0922 22:53:49.010341   169 net.cpp:541] conv3 -> conv3
+I0922 22:53:49.025774   169 net.cpp:259] Setting up conv3
+I0922 22:53:49.025790   169 net.cpp:266] TRAIN Top shape for layer 9 'conv3' 128 384 13 13 (8306688)
+I0922 22:53:49.025802   169 layer_factory.hpp:172] Creating layer 'relu3' of type 'ReLU'
+I0922 22:53:49.025808   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.025816   169 net.cpp:199] Created Layer relu3 (10)
+I0922 22:53:49.025821   169 net.cpp:571] relu3 <- conv3
+I0922 22:53:49.025827   169 net.cpp:526] relu3 -> conv3 (in-place)
+I0922 22:53:49.025835   169 net.cpp:259] Setting up relu3
+I0922 22:53:49.025842   169 net.cpp:266] TRAIN Top shape for layer 10 'relu3' 128 384 13 13 (8306688)
+I0922 22:53:49.025847   169 layer_factory.hpp:172] Creating layer 'conv4' of type 'Convolution'
+I0922 22:53:49.025853   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.025866   169 net.cpp:199] Created Layer conv4 (11)
+I0922 22:53:49.025871   169 net.cpp:571] conv4 <- conv3
+I0922 22:53:49.025876   169 net.cpp:541] conv4 -> conv4
+I0922 22:53:49.038125   169 net.cpp:259] Setting up conv4
+I0922 22:53:49.038141   169 net.cpp:266] TRAIN Top shape for layer 11 'conv4' 128 384 13 13 (8306688)
+I0922 22:53:49.038152   169 layer_factory.hpp:172] Creating layer 'relu4' of type 'ReLU'
+I0922 22:53:49.038158   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.038166   169 net.cpp:199] Created Layer relu4 (12)
+I0922 22:53:49.038172   169 net.cpp:571] relu4 <- conv4
+I0922 22:53:49.038178   169 net.cpp:526] relu4 -> conv4 (in-place)
+I0922 22:53:49.038187   169 net.cpp:259] Setting up relu4
+I0922 22:53:49.038192   169 net.cpp:266] TRAIN Top shape for layer 12 'relu4' 128 384 13 13 (8306688)
+I0922 22:53:49.038198   169 layer_factory.hpp:172] Creating layer 'conv5' of type 'Convolution'
+I0922 22:53:49.038203   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.038216   169 net.cpp:199] Created Layer conv5 (13)
+I0922 22:53:49.038221   169 net.cpp:571] conv5 <- conv4
+I0922 22:53:49.038226   169 net.cpp:541] conv5 -> conv5
+I0922 22:53:49.046186   169 net.cpp:259] Setting up conv5
+I0922 22:53:49.046202   169 net.cpp:266] TRAIN Top shape for layer 13 'conv5' 128 256 13 13 (5537792)
+I0922 22:53:49.046214   169 layer_factory.hpp:172] Creating layer 'relu5' of type 'ReLU'
+I0922 22:53:49.046221   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.046247   169 net.cpp:199] Created Layer relu5 (14)
+I0922 22:53:49.046252   169 net.cpp:571] relu5 <- conv5
+I0922 22:53:49.046259   169 net.cpp:526] relu5 -> conv5 (in-place)
+I0922 22:53:49.046267   169 net.cpp:259] Setting up relu5
+I0922 22:53:49.046274   169 net.cpp:266] TRAIN Top shape for layer 14 'relu5' 128 256 13 13 (5537792)
+I0922 22:53:49.046280   169 layer_factory.hpp:172] Creating layer 'pool5' of type 'Pooling'
+I0922 22:53:49.046284   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.046293   169 net.cpp:199] Created Layer pool5 (15)
+I0922 22:53:49.046299   169 net.cpp:571] pool5 <- conv5
+I0922 22:53:49.046304   169 net.cpp:541] pool5 -> pool5
+I0922 22:53:49.046361   169 net.cpp:259] Setting up pool5
+I0922 22:53:49.046370   169 net.cpp:266] TRAIN Top shape for layer 15 'pool5' 128 256 6 6 (1179648)
+I0922 22:53:49.046375   169 layer_factory.hpp:172] Creating layer 'fc6' of type 'InnerProduct'
+I0922 22:53:49.046381   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.046393   169 net.cpp:199] Created Layer fc6 (16)
+I0922 22:53:49.046399   169 net.cpp:571] fc6 <- pool5
+I0922 22:53:49.046406   169 net.cpp:541] fc6 -> fc6
+I0922 22:53:49.745208   169 net.cpp:259] Setting up fc6
+I0922 22:53:49.745244   169 net.cpp:266] TRAIN Top shape for layer 16 'fc6' 128 4096 (524288)
+I0922 22:53:49.745261   169 layer_factory.hpp:172] Creating layer 'relu6' of type 'ReLU'
+I0922 22:53:49.745270   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.745281   169 net.cpp:199] Created Layer relu6 (17)
+I0922 22:53:49.745288   169 net.cpp:571] relu6 <- fc6
+I0922 22:53:49.745296   169 net.cpp:526] relu6 -> fc6 (in-place)
+I0922 22:53:49.745311   169 net.cpp:259] Setting up relu6
+I0922 22:53:49.745317   169 net.cpp:266] TRAIN Top shape for layer 17 'relu6' 128 4096 (524288)
+I0922 22:53:49.745323   169 layer_factory.hpp:172] Creating layer 'drop6' of type 'Dropout'
+I0922 22:53:49.745328   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.745343   169 net.cpp:199] Created Layer drop6 (18)
+I0922 22:53:49.745347   169 net.cpp:571] drop6 <- fc6
+I0922 22:53:49.745353   169 net.cpp:526] drop6 -> fc6 (in-place)
+I0922 22:53:49.779762   169 net.cpp:259] Setting up drop6
+I0922 22:53:49.779785   169 net.cpp:266] TRAIN Top shape for layer 18 'drop6' 128 4096 (524288)
+I0922 22:53:49.779793   169 layer_factory.hpp:172] Creating layer 'fc7' of type 'InnerProduct'
+I0922 22:53:49.779800   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:49.779812   169 net.cpp:199] Created Layer fc7 (19)
+I0922 22:53:49.779819   169 net.cpp:571] fc7 <- fc6
+I0922 22:53:49.779827   169 net.cpp:541] fc7 -> fc7
+I0922 22:53:50.086294   169 net.cpp:259] Setting up fc7
+I0922 22:53:50.086328   169 net.cpp:266] TRAIN Top shape for layer 19 'fc7' 128 4096 (524288)
+I0922 22:53:50.086346   169 layer_factory.hpp:172] Creating layer 'relu7' of type 'ReLU'
+I0922 22:53:50.086354   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.086365   169 net.cpp:199] Created Layer relu7 (20)
+I0922 22:53:50.086371   169 net.cpp:571] relu7 <- fc7
+I0922 22:53:50.086380   169 net.cpp:526] relu7 -> fc7 (in-place)
+I0922 22:53:50.086393   169 net.cpp:259] Setting up relu7
+I0922 22:53:50.086400   169 net.cpp:266] TRAIN Top shape for layer 20 'relu7' 128 4096 (524288)
+I0922 22:53:50.086405   169 layer_factory.hpp:172] Creating layer 'drop7' of type 'Dropout'
+I0922 22:53:50.086411   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.086422   169 net.cpp:199] Created Layer drop7 (21)
+I0922 22:53:50.086427   169 net.cpp:571] drop7 <- fc7
+I0922 22:53:50.086432   169 net.cpp:526] drop7 -> fc7 (in-place)
+I0922 22:53:50.120911   169 net.cpp:259] Setting up drop7
+I0922 22:53:50.120963   169 net.cpp:266] TRAIN Top shape for layer 21 'drop7' 128 4096 (524288)
+I0922 22:53:50.120978   169 layer_factory.hpp:172] Creating layer 'fc8' of type 'InnerProduct'
+I0922 22:53:50.120988   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.121006   169 net.cpp:199] Created Layer fc8 (22)
+I0922 22:53:50.121016   169 net.cpp:571] fc8 <- fc7
+I0922 22:53:50.121027   169 net.cpp:541] fc8 -> fc8
+I0922 22:53:50.122319   169 net.cpp:259] Setting up fc8
+I0922 22:53:50.122341   169 net.cpp:266] TRAIN Top shape for layer 22 'fc8' 128 2 (256)
+I0922 22:53:50.122359   169 layer_factory.hpp:172] Creating layer 'loss' of type 'SoftmaxWithLoss'
+I0922 22:53:50.122370   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.122387   169 net.cpp:199] Created Layer loss (23)
+I0922 22:53:50.122397   169 net.cpp:571] loss <- fc8
+I0922 22:53:50.122408   169 net.cpp:571] loss <- label
+I0922 22:53:50.122419   169 net.cpp:541] loss -> loss
+I0922 22:53:50.122617   169 net.cpp:259] Setting up loss
+I0922 22:53:50.122634   169 net.cpp:266] TRAIN Top shape for layer 23 'loss' (1)
+I0922 22:53:50.122642   169 net.cpp:270]     with loss weight 1
+I0922 22:53:50.122673   169 net.cpp:335] loss needs backward computation.
+I0922 22:53:50.122684   169 net.cpp:335] fc8 needs backward computation.
+I0922 22:53:50.122694   169 net.cpp:335] drop7 needs backward computation.
+I0922 22:53:50.122704   169 net.cpp:335] relu7 needs backward computation.
+I0922 22:53:50.122712   169 net.cpp:335] fc7 needs backward computation.
+I0922 22:53:50.122720   169 net.cpp:335] drop6 needs backward computation.
+I0922 22:53:50.122728   169 net.cpp:335] relu6 needs backward computation.
+I0922 22:53:50.122735   169 net.cpp:335] fc6 needs backward computation.
+I0922 22:53:50.122743   169 net.cpp:335] pool5 needs backward computation.
+I0922 22:53:50.122751   169 net.cpp:335] relu5 needs backward computation.
+I0922 22:53:50.122759   169 net.cpp:335] conv5 needs backward computation.
+I0922 22:53:50.122767   169 net.cpp:335] relu4 needs backward computation.
+I0922 22:53:50.122774   169 net.cpp:335] conv4 needs backward computation.
+I0922 22:53:50.122781   169 net.cpp:335] relu3 needs backward computation.
+I0922 22:53:50.122790   169 net.cpp:335] conv3 needs backward computation.
+I0922 22:53:50.122798   169 net.cpp:335] pool2 needs backward computation.
+I0922 22:53:50.122807   169 net.cpp:335] norm2 needs backward computation.
+I0922 22:53:50.122814   169 net.cpp:335] relu2 needs backward computation.
+I0922 22:53:50.122823   169 net.cpp:335] conv2 needs backward computation.
+I0922 22:53:50.122830   169 net.cpp:335] pool1 needs backward computation.
+I0922 22:53:50.122838   169 net.cpp:335] norm1 needs backward computation.
+I0922 22:53:50.122846   169 net.cpp:335] relu1 needs backward computation.
+I0922 22:53:50.122854   169 net.cpp:335] conv1 needs backward computation.
+I0922 22:53:50.122864   169 net.cpp:337] train-data does not need backward computation.
+I0922 22:53:50.122871   169 net.cpp:379] This network produces output loss
+I0922 22:53:50.122907   169 net.cpp:402] Top memory (TRAIN) required for data: 1064352776 diff: 1064352776
+I0922 22:53:50.122920   169 net.cpp:405] Bottom memory (TRAIN) required for data: 1064352768 diff: 1064352768
+I0922 22:53:50.122927   169 net.cpp:408] Shared (in-place) memory (TRAIN) by data: 341229568 diff: 341229568
+I0922 22:53:50.122936   169 net.cpp:411] Parameters memory (TRAIN) required for data: 227505672 diff: 227505672
+I0922 22:53:50.122942   169 net.cpp:414] Parameters shared memory (TRAIN) by data: 0 diff: 0
+I0922 22:53:50.122951   169 net.cpp:420] Network initialization done.
+I0922 22:53:50.123505   169 solver.cpp:173] Creating test net (#0) specified by net file: train_val.prototxt
+I0922 22:53:50.123581   169 net.cpp:456] The NetState phase (1) differed from the phase (0) specified by a rule in layer train-data
+I0922 22:53:50.123886   169 net.cpp:79] Initializing net from parameters:
+state {
+phase: TEST
+}
+layer {
+name: "val-data"
+type: "Data"
+top: "data"
+top: "label"
+include {
+phase: TEST
+}
+transform_param {
+crop_size: 227
+mean_file: "/dli/data/digits/20190922-225123-167e/mean.binaryproto"
+}
+data_param {
+source: "/dli/data/digits/20190922-225123-167e/val_db"
+batch_size: 32
+backend: LMDB
+}
+}
+layer {
+name: "conv1"
+type: "Convolution"
+bottom: "data"
+top: "conv1"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+convolution_param {
+num_output: 96
+kernel_size: 11
+stride: 4
+weight_filler {
+type: "gaussian"
+std: 0.01
+}
+bias_filler {
+type: "constant"
+value: 0
+}
+}
+}
+layer {
+name: "relu1"
+type: "ReLU"
+bottom: "conv1"
+top: "conv1"
+}
+layer {
+name: "norm1"
+type: "LRN"
+bottom: "conv1"
+top: "norm1"
+lrn_param {
+local_size: 5
+alpha: 0.0001
+beta: 0.75
+}
+}
+layer {
+name: "pool1"
+type: "Pooling"
+bottom: "norm1"
+top: "pool1"
+pooling_param {
+pool: MAX
+kernel_size: 3
+stride: 2
+}
+}
+layer {
+name: "conv2"
+type: "Convolution"
+bottom: "pool1"
+top: "conv2"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+convolution_param {
+num_output: 256
+pad: 2
+kernel_size: 5
+group: 2
+weight_filler {
+type: "gaussian"
+std: 0.01
+}
+bias_filler {
+type: "constant"
+value: 0.1
+}
+}
+}
+layer {
+name: "relu2"
+type: "ReLU"
+bottom: "conv2"
+top: "conv2"
+}
+layer {
+name: "norm2"
+type: "LRN"
+bottom: "conv2"
+top: "norm2"
+lrn_param {
+local_size: 5
+alpha: 0.0001
+beta: 0.75
+}
+}
+layer {
+name: "pool2"
+type: "Pooling"
+bottom: "norm2"
+top: "pool2"
+pooling_param {
+pool: MAX
+kernel_size: 3
+stride: 2
+}
+}
+layer {
+name: "conv3"
+type: "Convolution"
+bottom: "pool2"
+top: "conv3"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+convolution_param {
+num_output: 384
+pad: 1
+kernel_size: 3
+weight_filler {
+type: "gaussian"
+std: 0.01
+}
+bias_filler {
+type: "constant"
+value: 0
+}
+}
+}
+layer {
+name: "relu3"
+type: "ReLU"
+bottom: "conv3"
+top: "conv3"
+}
+layer {
+name: "conv4"
+type: "Convolution"
+bottom: "conv3"
+top: "conv4"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+convolution_param {
+num_output: 384
+pad: 1
+kernel_size: 3
+group: 2
+weight_filler {
+type: "gaussian"
+std: 0.01
+}
+bias_filler {
+type: "constant"
+value: 0.1
+}
+}
+}
+layer {
+name: "relu4"
+type: "ReLU"
+bottom: "conv4"
+top: "conv4"
+}
+layer {
+name: "conv5"
+type: "Convolution"
+bottom: "conv4"
+top: "conv5"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+convolution_param {
+num_output: 256
+pad: 1
+kernel_size: 3
+group: 2
+weight_filler {
+type: "gaussian"
+std: 0.01
+}
+bias_filler {
+type: "constant"
+value: 0.1
+}
+}
+}
+layer {
+name: "relu5"
+type: "ReLU"
+bottom: "conv5"
+top: "conv5"
+}
+layer {
+name: "pool5"
+type: "Pooling"
+bottom: "conv5"
+top: "pool5"
+pooling_param {
+pool: MAX
+kernel_size: 3
+stride: 2
+}
+}
+layer {
+name: "fc6"
+type: "InnerProduct"
+bottom: "pool5"
+top: "fc6"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+inner_product_param {
+num_output: 4096
+weight_filler {
+type: "gaussian"
+std: 0.005
+}
+bias_filler {
+type: "constant"
+value: 0.1
+}
+}
+}
+layer {
+name: "relu6"
+type: "ReLU"
+bottom: "fc6"
+top: "fc6"
+}
+layer {
+name: "drop6"
+type: "Dropout"
+bottom: "fc6"
+top: "fc6"
+dropout_param {
+dropout_ratio: 0.5
+}
+}
+layer {
+name: "fc7"
+type: "InnerProduct"
+bottom: "fc6"
+top: "fc7"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+inner_product_param {
+num_output: 4096
+weight_filler {
+type: "gaussian"
+std: 0.005
+}
+bias_filler {
+type: "constant"
+value: 0.1
+}
+}
+}
+layer {
+name: "relu7"
+type: "ReLU"
+bottom: "fc7"
+top: "fc7"
+}
+layer {
+name: "drop7"
+type: "Dropout"
+bottom: "fc7"
+top: "fc7"
+dropout_param {
+dropout_ratio: 0.5
+}
+}
+layer {
+name: "fc8"
+type: "InnerProduct"
+bottom: "fc7"
+top: "fc8"
+param {
+lr_mult: 1
+decay_mult: 1
+}
+param {
+lr_mult: 2
+decay_mult: 0
+}
+inner_product_param {
+num_output: 2
+weight_filler {
+type: "gaussian"
+std: 0.01
+}
+bias_filler {
+type: "constant"
+value: 0
+}
+}
+}
+layer {
+name: "accuracy"
+type: "Accuracy"
+bottom: "fc8"
+bottom: "label"
+top: "accuracy"
+include {
+phase: TEST
+}
+}
+layer {
+name: "loss"
+type: "SoftmaxWithLoss"
+bottom: "fc8"
+bottom: "label"
+top: "loss"
+}
+I0922 22:53:50.124097   169 net.cpp:109] Using FLOAT as default forward math type
+I0922 22:53:50.124111   169 net.cpp:115] Using FLOAT as default backward math type
+I0922 22:53:50.124121   169 layer_factory.hpp:172] Creating layer 'val-data' of type 'Data'
+I0922 22:53:50.124130   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.124167   169 internal_thread.cpp:19] Starting 1 internal thread(s) on device 0
+I0922 22:53:50.124258   169 data_transformer.cpp:40] Loading mean file from: /dli/data/digits/20190922-225123-167e/mean.binaryproto
+I0922 22:53:50.133113   169 data_transformer.cpp:40] Loading mean file from: /dli/data/digits/20190922-225123-167e/mean.binaryproto
+I0922 22:53:50.137959   169 net.cpp:199] Created Layer val-data (0)
+I0922 22:53:50.137972   169 net.cpp:541] val-data -> data
+I0922 22:53:50.137981   169 net.cpp:541] val-data -> label
+I0922 22:53:50.137991   169 data_reader.cpp:58] Data Reader threads: 1, out queues: 1, depth: 32
+I0922 22:53:50.138008   169 internal_thread.cpp:19] Starting 1 internal thread(s) on device 0
+I0922 22:53:50.138772   179 db_lmdb.cpp:36] Opened lmdb /dli/data/digits/20190922-225123-167e/val_db
+I0922 22:53:50.140717   169 data_layer.cpp:199] (0) Output data size: 32, 3, 227, 227
+I0922 22:53:50.140733   169 data_transformer.cpp:40] Loading mean file from: /dli/data/digits/20190922-225123-167e/mean.binaryproto
+I0922 22:53:50.145113   169 data_transformer.cpp:40] Loading mean file from: /dli/data/digits/20190922-225123-167e/mean.binaryproto
+I0922 22:53:50.150084   169 internal_thread.cpp:19] Starting 1 internal thread(s) on device 0
+I0922 22:53:50.150166   169 net.cpp:259] Setting up val-data
+I0922 22:53:50.150179   169 net.cpp:266] TEST Top shape for layer 0 'val-data' 32 3 227 227 (4946784)
+I0922 22:53:50.150185   169 net.cpp:266] TEST Top shape for layer 0 'val-data' 32 (32)
+I0922 22:53:50.150835   169 layer_factory.hpp:172] Creating layer 'label_val-data_1_split' of type 'Split'
+I0922 22:53:50.150835   180 data_layer.cpp:105] (0) Parser threads: 1
+I0922 22:53:50.150844   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.150851   180 data_layer.cpp:107] (0) Transformer threads: 1
+I0922 22:53:50.150858   169 net.cpp:199] Created Layer label_val-data_1_split (1)
+I0922 22:53:50.150864   169 net.cpp:571] label_val-data_1_split <- label
+I0922 22:53:50.150871   169 net.cpp:541] label_val-data_1_split -> label_val-data_1_split_0
+I0922 22:53:50.150879   169 net.cpp:541] label_val-data_1_split -> label_val-data_1_split_1
+I0922 22:53:50.150939   169 net.cpp:259] Setting up label_val-data_1_split
+I0922 22:53:50.150948   169 net.cpp:266] TEST Top shape for layer 1 'label_val-data_1_split' 32 (32)
+I0922 22:53:50.150954   169 net.cpp:266] TEST Top shape for layer 1 'label_val-data_1_split' 32 (32)
+I0922 22:53:50.150959   169 layer_factory.hpp:172] Creating layer 'conv1' of type 'Convolution'
+I0922 22:53:50.150965   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.150981   169 net.cpp:199] Created Layer conv1 (2)
+I0922 22:53:50.151002   169 net.cpp:571] conv1 <- data
+I0922 22:53:50.151008   169 net.cpp:541] conv1 -> conv1
+I0922 22:53:50.151885   169 net.cpp:259] Setting up conv1
+I0922 22:53:50.151896   169 net.cpp:266] TEST Top shape for layer 2 'conv1' 32 96 55 55 (9292800)
+I0922 22:53:50.151909   169 layer_factory.hpp:172] Creating layer 'relu1' of type 'ReLU'
+I0922 22:53:50.151914   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.151923   169 net.cpp:199] Created Layer relu1 (3)
+I0922 22:53:50.151928   169 net.cpp:571] relu1 <- conv1
+I0922 22:53:50.151933   169 net.cpp:526] relu1 -> conv1 (in-place)
+I0922 22:53:50.151943   169 net.cpp:259] Setting up relu1
+I0922 22:53:50.151949   169 net.cpp:266] TEST Top shape for layer 3 'relu1' 32 96 55 55 (9292800)
+I0922 22:53:50.151954   169 layer_factory.hpp:172] Creating layer 'norm1' of type 'LRN'
+I0922 22:53:50.151959   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.151973   169 net.cpp:199] Created Layer norm1 (4)
+I0922 22:53:50.151978   169 net.cpp:571] norm1 <- conv1
+I0922 22:53:50.151983   169 net.cpp:541] norm1 -> norm1
+I0922 22:53:50.152026   169 net.cpp:259] Setting up norm1
+I0922 22:53:50.152034   169 net.cpp:266] TEST Top shape for layer 4 'norm1' 32 96 55 55 (9292800)
+I0922 22:53:50.152040   169 layer_factory.hpp:172] Creating layer 'pool1' of type 'Pooling'
+I0922 22:53:50.152045   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.152053   169 net.cpp:199] Created Layer pool1 (5)
+I0922 22:53:50.152058   169 net.cpp:571] pool1 <- norm1
+I0922 22:53:50.152065   169 net.cpp:541] pool1 -> pool1
+I0922 22:53:50.152118   169 net.cpp:259] Setting up pool1
+I0922 22:53:50.152125   169 net.cpp:266] TEST Top shape for layer 5 'pool1' 32 96 27 27 (2239488)
+I0922 22:53:50.152132   169 layer_factory.hpp:172] Creating layer 'conv2' of type 'Convolution'
+I0922 22:53:50.152137   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.152149   169 net.cpp:199] Created Layer conv2 (6)
+I0922 22:53:50.152154   169 net.cpp:571] conv2 <- pool1
+I0922 22:53:50.152159   169 net.cpp:541] conv2 -> conv2
+I0922 22:53:50.161159   169 net.cpp:259] Setting up conv2
+I0922 22:53:50.161177   169 net.cpp:266] TEST Top shape for layer 6 'conv2' 32 256 27 27 (5971968)
+I0922 22:53:50.161191   169 layer_factory.hpp:172] Creating layer 'relu2' of type 'ReLU'
+I0922 22:53:50.161197   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.161206   169 net.cpp:199] Created Layer relu2 (7)
+I0922 22:53:50.161212   169 net.cpp:571] relu2 <- conv2
+I0922 22:53:50.161218   169 net.cpp:526] relu2 -> conv2 (in-place)
+I0922 22:53:50.161228   169 net.cpp:259] Setting up relu2
+I0922 22:53:50.161234   169 net.cpp:266] TEST Top shape for layer 7 'relu2' 32 256 27 27 (5971968)
+I0922 22:53:50.161240   169 layer_factory.hpp:172] Creating layer 'norm2' of type 'LRN'
+I0922 22:53:50.161245   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.161258   169 net.cpp:199] Created Layer norm2 (8)
+I0922 22:53:50.161264   169 net.cpp:571] norm2 <- conv2
+I0922 22:53:50.161269   169 net.cpp:541] norm2 -> norm2
+I0922 22:53:50.161320   169 net.cpp:259] Setting up norm2
+I0922 22:53:50.161329   169 net.cpp:266] TEST Top shape for layer 8 'norm2' 32 256 27 27 (5971968)
+I0922 22:53:50.161335   169 layer_factory.hpp:172] Creating layer 'pool2' of type 'Pooling'
+I0922 22:53:50.161341   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.161350   169 net.cpp:199] Created Layer pool2 (9)
+I0922 22:53:50.161355   169 net.cpp:571] pool2 <- norm2
+I0922 22:53:50.161361   169 net.cpp:541] pool2 -> pool2
+I0922 22:53:50.161415   169 net.cpp:259] Setting up pool2
+I0922 22:53:50.161423   169 net.cpp:266] TEST Top shape for layer 9 'pool2' 32 256 13 13 (1384448)
+I0922 22:53:50.161444   169 layer_factory.hpp:172] Creating layer 'conv3' of type 'Convolution'
+I0922 22:53:50.161451   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.161465   169 net.cpp:199] Created Layer conv3 (10)
+I0922 22:53:50.161470   169 net.cpp:571] conv3 <- pool2
+I0922 22:53:50.161476   169 net.cpp:541] conv3 -> conv3
+I0922 22:53:50.177033   169 net.cpp:259] Setting up conv3
+I0922 22:53:50.177050   169 net.cpp:266] TEST Top shape for layer 10 'conv3' 32 384 13 13 (2076672)
+I0922 22:53:50.177062   169 layer_factory.hpp:172] Creating layer 'relu3' of type 'ReLU'
+I0922 22:53:50.177068   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.177078   169 net.cpp:199] Created Layer relu3 (11)
+I0922 22:53:50.177083   169 net.cpp:571] relu3 <- conv3
+I0922 22:53:50.177088   169 net.cpp:526] relu3 -> conv3 (in-place)
+I0922 22:53:50.177098   169 net.cpp:259] Setting up relu3
+I0922 22:53:50.177104   169 net.cpp:266] TEST Top shape for layer 11 'relu3' 32 384 13 13 (2076672)
+I0922 22:53:50.177110   169 layer_factory.hpp:172] Creating layer 'conv4' of type 'Convolution'
+I0922 22:53:50.177115   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.177129   169 net.cpp:199] Created Layer conv4 (12)
+I0922 22:53:50.177135   169 net.cpp:571] conv4 <- conv3
+I0922 22:53:50.177140   169 net.cpp:541] conv4 -> conv4
+I0922 22:53:50.192186   169 net.cpp:259] Setting up conv4
+I0922 22:53:50.192209   169 net.cpp:266] TEST Top shape for layer 12 'conv4' 32 384 13 13 (2076672)
+I0922 22:53:50.192229   169 layer_factory.hpp:172] Creating layer 'relu4' of type 'ReLU'
+I0922 22:53:50.192239   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.192252   169 net.cpp:199] Created Layer relu4 (13)
+I0922 22:53:50.192261   169 net.cpp:571] relu4 <- conv4
+I0922 22:53:50.192273   169 net.cpp:526] relu4 -> conv4 (in-place)
+I0922 22:53:50.192287   169 net.cpp:259] Setting up relu4
+I0922 22:53:50.192298   169 net.cpp:266] TEST Top shape for layer 13 'relu4' 32 384 13 13 (2076672)
+I0922 22:53:50.192308   169 layer_factory.hpp:172] Creating layer 'conv5' of type 'Convolution'
+I0922 22:53:50.192318   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.192343   169 net.cpp:199] Created Layer conv5 (14)
+I0922 22:53:50.192353   169 net.cpp:571] conv5 <- conv4
+I0922 22:53:50.192363   169 net.cpp:541] conv5 -> conv5
+I0922 22:53:50.201737   169 net.cpp:259] Setting up conv5
+I0922 22:53:50.201755   169 net.cpp:266] TEST Top shape for layer 14 'conv5' 32 256 13 13 (1384448)
+I0922 22:53:50.201769   169 layer_factory.hpp:172] Creating layer 'relu5' of type 'ReLU'
+I0922 22:53:50.201776   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.201784   169 net.cpp:199] Created Layer relu5 (15)
+I0922 22:53:50.201789   169 net.cpp:571] relu5 <- conv5
+I0922 22:53:50.201797   169 net.cpp:526] relu5 -> conv5 (in-place)
+I0922 22:53:50.201804   169 net.cpp:259] Setting up relu5
+I0922 22:53:50.201812   169 net.cpp:266] TEST Top shape for layer 15 'relu5' 32 256 13 13 (1384448)
+I0922 22:53:50.201817   169 layer_factory.hpp:172] Creating layer 'pool5' of type 'Pooling'
+I0922 22:53:50.201822   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.201834   169 net.cpp:199] Created Layer pool5 (16)
+I0922 22:53:50.201840   169 net.cpp:571] pool5 <- conv5
+I0922 22:53:50.201845   169 net.cpp:541] pool5 -> pool5
+I0922 22:53:50.201911   169 net.cpp:259] Setting up pool5
+I0922 22:53:50.201920   169 net.cpp:266] TEST Top shape for layer 16 'pool5' 32 256 6 6 (294912)
+I0922 22:53:50.201926   169 layer_factory.hpp:172] Creating layer 'fc6' of type 'InnerProduct'
+I0922 22:53:50.201932   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.201941   169 net.cpp:199] Created Layer fc6 (17)
+I0922 22:53:50.201962   169 net.cpp:571] fc6 <- pool5
+I0922 22:53:50.201969   169 net.cpp:541] fc6 -> fc6
+I0922 22:53:50.891147   169 net.cpp:259] Setting up fc6
+I0922 22:53:50.891183   169 net.cpp:266] TEST Top shape for layer 17 'fc6' 32 4096 (131072)
+I0922 22:53:50.891201   169 layer_factory.hpp:172] Creating layer 'relu6' of type 'ReLU'
+I0922 22:53:50.891209   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.891222   169 net.cpp:199] Created Layer relu6 (18)
+I0922 22:53:50.891227   169 net.cpp:571] relu6 <- fc6
+I0922 22:53:50.891237   169 net.cpp:526] relu6 -> fc6 (in-place)
+I0922 22:53:50.891250   169 net.cpp:259] Setting up relu6
+I0922 22:53:50.891258   169 net.cpp:266] TEST Top shape for layer 18 'relu6' 32 4096 (131072)
+I0922 22:53:50.891263   169 layer_factory.hpp:172] Creating layer 'drop6' of type 'Dropout'
+I0922 22:53:50.891268   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.891291   169 net.cpp:199] Created Layer drop6 (19)
+I0922 22:53:50.891296   169 net.cpp:571] drop6 <- fc6
+I0922 22:53:50.891301   169 net.cpp:526] drop6 -> fc6 (in-place)
+I0922 22:53:50.925721   169 net.cpp:259] Setting up drop6
+I0922 22:53:50.925746   169 net.cpp:266] TEST Top shape for layer 19 'drop6' 32 4096 (131072)
+I0922 22:53:50.925755   169 layer_factory.hpp:172] Creating layer 'fc7' of type 'InnerProduct'
+I0922 22:53:50.925762   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:50.925777   169 net.cpp:199] Created Layer fc7 (20)
+I0922 22:53:50.925784   169 net.cpp:571] fc7 <- fc6
+I0922 22:53:50.925792   169 net.cpp:541] fc7 -> fc7
+I0922 22:53:51.233100   169 net.cpp:259] Setting up fc7
+I0922 22:53:51.233135   169 net.cpp:266] TEST Top shape for layer 20 'fc7' 32 4096 (131072)
+I0922 22:53:51.233151   169 layer_factory.hpp:172] Creating layer 'relu7' of type 'ReLU'
+I0922 22:53:51.233160   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:51.233170   169 net.cpp:199] Created Layer relu7 (21)
+I0922 22:53:51.233176   169 net.cpp:571] relu7 <- fc7
+I0922 22:53:51.233186   169 net.cpp:526] relu7 -> fc7 (in-place)
+I0922 22:53:51.233199   169 net.cpp:259] Setting up relu7
+I0922 22:53:51.233206   169 net.cpp:266] TEST Top shape for layer 21 'relu7' 32 4096 (131072)
+I0922 22:53:51.233211   169 layer_factory.hpp:172] Creating layer 'drop7' of type 'Dropout'
+I0922 22:53:51.233217   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:51.233230   169 net.cpp:199] Created Layer drop7 (22)
+I0922 22:53:51.233235   169 net.cpp:571] drop7 <- fc7
+I0922 22:53:51.233240   169 net.cpp:526] drop7 -> fc7 (in-place)
+I0922 22:53:51.267765   169 net.cpp:259] Setting up drop7
+I0922 22:53:51.267791   169 net.cpp:266] TEST Top shape for layer 22 'drop7' 32 4096 (131072)
+I0922 22:53:51.267799   169 layer_factory.hpp:172] Creating layer 'fc8' of type 'InnerProduct'
+I0922 22:53:51.267807   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:51.267822   169 net.cpp:199] Created Layer fc8 (23)
+I0922 22:53:51.267828   169 net.cpp:571] fc8 <- fc7
+I0922 22:53:51.267837   169 net.cpp:541] fc8 -> fc8
+I0922 22:53:51.268123   169 net.cpp:259] Setting up fc8
+I0922 22:53:51.268134   169 net.cpp:266] TEST Top shape for layer 23 'fc8' 32 2 (64)
+I0922 22:53:51.268146   169 layer_factory.hpp:172] Creating layer 'fc8_fc8_0_split' of type 'Split'
+I0922 22:53:51.268151   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:51.268162   169 net.cpp:199] Created Layer fc8_fc8_0_split (24)
+I0922 22:53:51.268167   169 net.cpp:571] fc8_fc8_0_split <- fc8
+I0922 22:53:51.268173   169 net.cpp:541] fc8_fc8_0_split -> fc8_fc8_0_split_0
+I0922 22:53:51.268180   169 net.cpp:541] fc8_fc8_0_split -> fc8_fc8_0_split_1
+I0922 22:53:51.268229   169 net.cpp:259] Setting up fc8_fc8_0_split
+I0922 22:53:51.268254   169 net.cpp:266] TEST Top shape for layer 24 'fc8_fc8_0_split' 32 2 (64)
+I0922 22:53:51.268260   169 net.cpp:266] TEST Top shape for layer 24 'fc8_fc8_0_split' 32 2 (64)
+I0922 22:53:51.268265   169 layer_factory.hpp:172] Creating layer 'accuracy' of type 'Accuracy'
+I0922 22:53:51.268270   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:51.268287   169 net.cpp:199] Created Layer accuracy (25)
+I0922 22:53:51.268292   169 net.cpp:571] accuracy <- fc8_fc8_0_split_0
+I0922 22:53:51.268299   169 net.cpp:571] accuracy <- label_val-data_1_split_0
+I0922 22:53:51.268306   169 net.cpp:541] accuracy -> accuracy
+I0922 22:53:51.268316   169 net.cpp:259] Setting up accuracy
+I0922 22:53:51.268321   169 net.cpp:266] TEST Top shape for layer 25 'accuracy' (1)
+I0922 22:53:51.268327   169 layer_factory.hpp:172] Creating layer 'loss' of type 'SoftmaxWithLoss'
+I0922 22:53:51.268332   169 layer_factory.hpp:184] Layer's types are Ftype:FLOAT Btype:FLOAT Fmath:FLOAT Bmath:FLOAT
+I0922 22:53:51.268342   169 net.cpp:199] Created Layer loss (26)
+I0922 22:53:51.268347   169 net.cpp:571] loss <- fc8_fc8_0_split_1
+I0922 22:53:51.268352   169 net.cpp:571] loss <- label_val-data_1_split_1
+I0922 22:53:51.268357   169 net.cpp:541] loss -> loss
+I0922 22:53:51.268488   169 net.cpp:259] Setting up loss
+I0922 22:53:51.268496   169 net.cpp:266] TEST Top shape for layer 26 'loss' (1)
+I0922 22:53:51.268501   169 net.cpp:270]     with loss weight 1
+I0922 22:53:51.268514   169 net.cpp:335] loss needs backward computation.
+I0922 22:53:51.268522   169 net.cpp:337] accuracy does not need backward computation.
+I0922 22:53:51.268527   169 net.cpp:335] fc8_fc8_0_split needs backward computation.
+I0922 22:53:51.268532   169 net.cpp:335] fc8 needs backward computation.
+I0922 22:53:51.268537   169 net.cpp:335] drop7 needs backward computation.
+I0922 22:53:51.268543   169 net.cpp:335] relu7 needs backward computation.
+I0922 22:53:51.268548   169 net.cpp:335] fc7 needs backward computation.
+I0922 22:53:51.268551   169 net.cpp:335] drop6 needs backward computation.
+I0922 22:53:51.268556   169 net.cpp:335] relu6 needs backward computation.
+I0922 22:53:51.268561   169 net.cpp:335] fc6 needs backward computation.
+I0922 22:53:51.268566   169 net.cpp:335] pool5 needs backward computation.
+I0922 22:53:51.268571   169 net.cpp:335] relu5 needs backward computation.
+I0922 22:53:51.268577   169 net.cpp:335] conv5 needs backward computation.
+I0922 22:53:51.268582   169 net.cpp:335] relu4 needs backward computation.
+I0922 22:53:51.268587   169 net.cpp:335] conv4 needs backward computation.
+I0922 22:53:51.268592   169 net.cpp:335] relu3 needs backward computation.
+I0922 22:53:51.268597   169 net.cpp:335] conv3 needs backward computation.
+I0922 22:53:51.268605   169 net.cpp:335] pool2 needs backward computation.
+I0922 22:53:51.268611   169 net.cpp:335] norm2 needs backward computation.
+I0922 22:53:51.268616   169 net.cpp:335] relu2 needs backward computation.
+I0922 22:53:51.268621   169 net.cpp:335] conv2 needs backward computation.
+I0922 22:53:51.268626   169 net.cpp:335] pool1 needs backward computation.
+I0922 22:53:51.268631   169 net.cpp:335] norm1 needs backward computation.
+I0922 22:53:51.268636   169 net.cpp:335] relu1 needs backward computation.
+I0922 22:53:51.268640   169 net.cpp:335] conv1 needs backward computation.
+I0922 22:53:51.268646   169 net.cpp:337] label_val-data_1_split does not need backward computation.
+I0922 22:53:51.268652   169 net.cpp:337] val-data does not need backward computation.
+I0922 22:53:51.268656   169 net.cpp:379] This network produces output accuracy
+I0922 22:53:51.268661   169 net.cpp:379] This network produces output loss
+I0922 22:53:51.268687   169 net.cpp:402] Top memory (TEST) required for data: 266088976 diff: 266088976
+I0922 22:53:51.268693   169 net.cpp:405] Bottom memory (TEST) required for data: 266088960 diff: 266088960
+I0922 22:53:51.268697   169 net.cpp:408] Shared (in-place) memory (TEST) by data: 85307392 diff: 85307392
+I0922 22:53:51.268702   169 net.cpp:411] Parameters memory (TEST) required for data: 227505672 diff: 227505672
+I0922 22:53:51.268716   169 net.cpp:414] Parameters shared memory (TEST) by data: 0 diff: 0
+I0922 22:53:51.268721   169 net.cpp:420] Network initialization done.
+I0922 22:53:51.268807   169 solver.cpp:54] Solver scaffolding done.
+I0922 22:53:51.269551   169 caffe.cpp:256] Starting Optimization
+I0922 22:53:51.269562   169 solver.cpp:433] Solving
+I0922 22:53:51.269565   169 solver.cpp:434] Learning Rate Policy: step
+I0922 22:53:51.269583   169 net.cpp:1408] [0] Reserving 227506176 bytes of shared learnable space for type FLOAT
+I0922 22:53:51.302388   169 solver.cpp:267] Initial Test started...
+I0922 22:53:51.302415   169 solver.cpp:516] Iteration 0, Testing net (#0)
+I0922 22:53:51.302423   169 net.cpp:1064] Ignoring source layer train-data
+I0922 22:53:51.313413   181 common.cpp:528] NVML initialized, thread 181
+I0922 22:53:51.329782   181 common.cpp:550] NVML succeeded to set CPU affinity on device 0, thread 181
+I0922 22:53:51.395040   169 solver.cpp:602]     Test net output #0: accuracy = 0.46875
+I0922 22:53:51.395078   169 solver.cpp:602]     Test net output #1: loss = 0.691323 (* 1 = 0.691323 loss)
+I0922 22:53:51.395112   169 solver.cpp:272] Initial Test completed in 0.0926821s
+I0922 22:53:51.395781   177 internal_thread.cpp:40] Restarting 4 internal thread(s) on device 0
+I0922 22:53:51.396230   177 internal_thread.cpp:19] Starting 1 internal thread(s) on device 0
+I0922 22:53:51.396292   177 data_transformer.cpp:40] Loading mean file from: /dli/data/digits/20190922-225123-167e/mean.binaryproto
+I0922 22:53:51.396970   186 common.cpp:550] NVML succeeded to set CPU affinity on device 0, thread 186
+I0922 22:53:51.405161   177 data_transformer.cpp:40] Loading mean file from: /dli/data/digits/20190922-225123-167e/mean.binaryproto
+I0922 22:53:51.413416   177 data_transformer.cpp:40] Loading mean file from: /dli/data/digits/20190922-225123-167e/mean.binaryproto
+I0922 22:53:51.421252   177 data_transformer.cpp:40] Loading mean file from: /dli/data/digits/20190922-225123-167e/mean.binaryproto
+I0922 22:53:51.425999   177 data_reader.cpp:58] Data Reader threads: 3, out queues: 12, depth: 128
+I0922 22:53:51.426338   177 internal_thread.cpp:19] Starting 3 internal thread(s) on device 0
+I0922 22:53:51.427613   187 db_lmdb.cpp:36] Opened lmdb /dli/data/digits/20190922-225123-167e/train_db
+I0922 22:53:51.428551   189 db_lmdb.cpp:36] Opened lmdb /dli/data/digits/20190922-225123-167e/train_db
+I0922 22:53:51.429142   177 data_layer.cpp:199] [0] Output data size: 128, 3, 227, 227
+I0922 22:53:51.429145   188 db_lmdb.cpp:36] Opened lmdb /dli/data/digits/20190922-225123-167e/train_db
+I0922 22:53:51.429239   177 data_layer.cpp:105] [0] Parser threads: 3 (auto)
+I0922 22:53:51.429251   177 data_layer.cpp:107] [0] Transformer threads: 4 (auto)
+I0922 22:53:52.635246   169 solver.cpp:356] Iteration 0 (1.24008 s), loss = 0.693008
+I0922 22:53:52.635318   169 solver.cpp:374]     Train net output #0: loss = 0.693008 (* 1 = 0.693008 loss)
+I0922 22:53:52.635356   169 sgd_solver.cpp:170] Iteration 0, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:53:53.166936   169 solver.cpp:356] Iteration 1 (0.531685 s), loss = 0.6878
+I0922 22:53:53.166988   169 solver.cpp:374]     Train net output #0: loss = 0.6878 (* 1 = 0.6878 loss)
+I0922 22:53:53.652135   169 cudnn_conv_layer.cpp:849] [0] Conv Algos (F,BD,BF): 'conv1' with space 0.01M 3/1 1 1 3 	(avail 9.17G, req 0.01M)	t: 0 0 21.6
+I0922 22:53:55.204380   169 cudnn_conv_layer.cpp:849] [0] Conv Algos (F,BD,BF): 'conv2' with space 0.28G 96/2 5 3 5 	(avail 8.89G, req 0.28G)	t: 0 3.32 5.67
+I0922 22:53:56.622766   169 cudnn_conv_layer.cpp:849] [0] Conv Algos (F,BD,BF): 'conv3' with space 0.28G 256/1 7 5 2 	(avail 8.89G, req 0.28G)	t: 0 7.86 10.63
+I0922 22:53:57.515290   169 cudnn_conv_layer.cpp:849] [0] Conv Algos (F,BD,BF): 'conv4' with space 0.29G 384/2 4 2 2 	(avail 8.88G, req 0.29G)	t: 0 4.01 3.91
+I0922 22:53:58.273787   169 cudnn_conv_layer.cpp:849] [0] Conv Algos (F,BD,BF): 'conv5' with space 0.29G 384/2 7 2 2 	(avail 8.88G, req 0.29G)	t: 0 2.78 2.91
+I0922 22:53:58.419505   169 solver.cpp:356] Iteration 2 (5.25264 s), loss = 0.684039
+I0922 22:53:58.419548   169 solver.cpp:374]     Train net output #0: loss = 0.684039 (* 1 = 0.684039 loss)
+I0922 22:53:59.311144   169 solver.cpp:350] Iteration 6 (4.48614 iter/s, 0.891635s/4 iter), loss = 0.630068
+I0922 22:53:59.311187   169 solver.cpp:374]     Train net output #0: loss = 0.630068 (* 1 = 0.630068 loss)
+I0922 22:53:59.311198   169 sgd_solver.cpp:170] Iteration 6, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:00.654829   169 solver.cpp:350] Iteration 12 (4.46528 iter/s, 1.3437s/6 iter), loss = 0.302122
+I0922 22:54:00.654875   169 solver.cpp:374]     Train net output #0: loss = 0.302122 (* 1 = 0.302122 loss)
+I0922 22:54:00.654886   169 sgd_solver.cpp:170] Iteration 12, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:02.014963   169 solver.cpp:350] Iteration 18 (4.4114 iter/s, 1.36011s/6 iter), loss = 0.340755
+I0922 22:54:02.015022   169 solver.cpp:374]     Train net output #0: loss = 0.340755 (* 1 = 0.340755 loss)
+I0922 22:54:02.015038   169 sgd_solver.cpp:170] Iteration 18, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:03.366197   169 solver.cpp:350] Iteration 24 (4.44032 iter/s, 1.35125s/6 iter), loss = 0.13512
+I0922 22:54:03.366240   169 solver.cpp:374]     Train net output #0: loss = 0.13512 (* 1 = 0.13512 loss)
+I0922 22:54:03.366250   169 sgd_solver.cpp:170] Iteration 24, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:03.832346   187 data_reader.cpp:320] Restarting data pre-fetching
+I0922 22:54:04.711108   169 solver.cpp:350] Iteration 30 (4.4613 iter/s, 1.3449s/6 iter), 0.6/5.1ep, loss = 0.149078
+I0922 22:54:04.711153   169 solver.cpp:374]     Train net output #0: loss = 0.149078 (* 1 = 0.149078 loss)
+I0922 22:54:04.711165   169 sgd_solver.cpp:170] Iteration 30, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:06.057019   169 solver.cpp:350] Iteration 36 (4.45797 iter/s, 1.3459s/6 iter), 0.7/5.1ep, loss = 0.106059
+I0922 22:54:06.057052   169 solver.cpp:374]     Train net output #0: loss = 0.106059 (* 1 = 0.106059 loss)
+I0922 22:54:06.057063   169 sgd_solver.cpp:170] Iteration 36, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:07.402070   169 solver.cpp:350] Iteration 42 (4.46076 iter/s, 1.34506s/6 iter), 0.8/5.1ep, loss = 0.134271
+I0922 22:54:07.402101   169 solver.cpp:374]     Train net output #0: loss = 0.134271 (* 1 = 0.134271 loss)
+I0922 22:54:07.402112   169 sgd_solver.cpp:170] Iteration 42, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:08.748102   169 solver.cpp:350] Iteration 48 (4.45757 iter/s, 1.34602s/6 iter), 0.9/5.1ep, loss = 0.0871221
+I0922 22:54:08.748133   169 solver.cpp:374]     Train net output #0: loss = 0.0871221 (* 1 = 0.0871221 loss)
+I0922 22:54:08.748143   169 sgd_solver.cpp:170] Iteration 48, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:09.866497   169 solver.cpp:782] Snapshotting to binary proto file snapshot_iter_54.caffemodel
+I0922 22:54:10.434656   169 sgd_solver.cpp:396] Snapshotting solver state to binary proto file snapshot_iter_54.solverstate
+I0922 22:54:10.604382   169 solver.cpp:516] Iteration 54, Testing net (#0)
+I0922 22:54:15.747366   179 data_reader.cpp:320] Restarting data pre-fetching
+I0922 22:54:15.930290   169 solver.cpp:602]     Test net output #0: accuracy = 0.950704
+I0922 22:54:15.930332   169 solver.cpp:602]     Test net output #1: loss = 0.130315 (* 1 = 0.130315 loss)
+I0922 22:54:15.930366   169 solver.cpp:281] Tests completed in 7.18239s
+I0922 22:54:16.146507   169 solver.cpp:350] Iteration 54 (0.835376 iter/s, 7.18239s/6 iter), 1/5.1ep, loss = 0.25483
+I0922 22:54:16.146548   169 solver.cpp:374]     Train net output #0: loss = 0.25483 (* 1 = 0.25483 loss)
+I0922 22:54:16.146562   169 sgd_solver.cpp:170] Iteration 54, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:17.491114   169 solver.cpp:350] Iteration 60 (4.4623 iter/s, 1.3446s/6 iter), 1.1/5.1ep, loss = 0.0563407
+I0922 22:54:17.491173   169 solver.cpp:374]     Train net output #0: loss = 0.0563407 (* 1 = 0.0563407 loss)
+I0922 22:54:17.491194   169 sgd_solver.cpp:170] Iteration 60, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:18.838232   169 solver.cpp:350] Iteration 66 (4.45394 iter/s, 1.34712s/6 iter), 1.2/5.1ep, loss = 0.106511
+I0922 22:54:18.838397   169 solver.cpp:374]     Train net output #0: loss = 0.106511 (* 1 = 0.106511 loss)
+I0922 22:54:18.838410   169 sgd_solver.cpp:170] Iteration 66, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:20.187734   169 solver.cpp:350] Iteration 72 (4.44604 iter/s, 1.34951s/6 iter), 1.4/5.1ep, loss = 0.107421
+I0922 22:54:20.187765   169 solver.cpp:374]     Train net output #0: loss = 0.107421 (* 1 = 0.107421 loss)
+I0922 22:54:20.187777   169 sgd_solver.cpp:170] Iteration 72, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:21.532368   169 solver.cpp:350] Iteration 78 (4.46213 iter/s, 1.34465s/6 iter), 1.5/5.1ep, loss = 0.0731882
+I0922 22:54:21.532398   169 solver.cpp:374]     Train net output #0: loss = 0.0731882 (* 1 = 0.0731882 loss)
+I0922 22:54:21.532410   169 sgd_solver.cpp:170] Iteration 78, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:21.936815   187 data_reader.cpp:320] Restarting data pre-fetching
+I0922 22:54:22.875124   169 solver.cpp:350] Iteration 84 (4.46849 iter/s, 1.34274s/6 iter), 1.6/5.1ep, loss = 0.0790376
+I0922 22:54:22.875166   169 solver.cpp:374]     Train net output #0: loss = 0.0790376 (* 1 = 0.0790376 loss)
+I0922 22:54:22.875183   169 sgd_solver.cpp:170] Iteration 84, lr = 0.01, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:24.227980   169 solver.cpp:350] Iteration 90 (4.435 iter/s, 1.35288s/6 iter), 1.7/5.1ep, loss = 0.127131
+I0922 22:54:24.228013   169 solver.cpp:374]     Train net output #0: loss = 0.127131 (* 1 = 0.127131 loss)
+I0922 22:54:24.228022   169 sgd_solver.cpp:170] Iteration 90, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:25.577061   169 solver.cpp:350] Iteration 96 (4.44743 iter/s, 1.34909s/6 iter), 1.8/5.1ep, loss = 0.245579
+I0922 22:54:25.577092   169 solver.cpp:374]     Train net output #0: loss = 0.245579 (* 1 = 0.245579 loss)
+I0922 22:54:25.577102   169 sgd_solver.cpp:170] Iteration 96, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:26.925729   169 solver.cpp:350] Iteration 102 (4.44887 iter/s, 1.34866s/6 iter), 1.9/5.1ep, loss = 0.151446
+I0922 22:54:26.925760   169 solver.cpp:374]     Train net output #0: loss = 0.151446 (* 1 = 0.151446 loss)
+I0922 22:54:26.925771   169 sgd_solver.cpp:170] Iteration 102, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:28.053455   169 solver.cpp:782] Snapshotting to binary proto file snapshot_iter_108.caffemodel
+I0922 22:54:28.439273   169 sgd_solver.cpp:396] Snapshotting solver state to binary proto file snapshot_iter_108.solverstate
+I0922 22:54:28.623968   169 solver.cpp:516] Iteration 108, Testing net (#0)
+I0922 22:54:33.895007   179 data_reader.cpp:320] Restarting data pre-fetching
+I0922 22:54:34.098174   169 solver.cpp:602]     Test net output #0: accuracy = 0.966989
+I0922 22:54:34.098214   169 solver.cpp:602]     Test net output #1: loss = 0.096698 (* 1 = 0.096698 loss)
+I0922 22:54:34.098249   169 solver.cpp:281] Tests completed in 7.17265s
+I0922 22:54:34.314278   169 solver.cpp:350] Iteration 108 (0.836511 iter/s, 7.17265s/6 iter), 2/5.1ep, loss = 0.158778
+I0922 22:54:34.314311   169 solver.cpp:374]     Train net output #0: loss = 0.158778 (* 1 = 0.158778 loss)
+I0922 22:54:34.314321   169 sgd_solver.cpp:170] Iteration 108, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:35.663753   169 solver.cpp:350] Iteration 114 (4.44617 iter/s, 1.34948s/6 iter), 2.1/5.1ep, loss = 0.0559698
+I0922 22:54:35.663796   169 solver.cpp:374]     Train net output #0: loss = 0.0559698 (* 1 = 0.0559698 loss)
+I0922 22:54:35.663810   169 sgd_solver.cpp:170] Iteration 114, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:37.014719   169 solver.cpp:350] Iteration 120 (4.44137 iter/s, 1.35094s/6 iter), 2.3/5.1ep, loss = 0.0440994
+I0922 22:54:37.014776   169 solver.cpp:374]     Train net output #0: loss = 0.0440994 (* 1 = 0.0440994 loss)
+I0922 22:54:37.014797   169 sgd_solver.cpp:170] Iteration 120, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:38.364154   169 solver.cpp:350] Iteration 126 (4.44623 iter/s, 1.34946s/6 iter), 2.4/5.1ep, loss = 0.131347
+I0922 22:54:38.364197   169 solver.cpp:374]     Train net output #0: loss = 0.131347 (* 1 = 0.131347 loss)
+I0922 22:54:38.364251   169 sgd_solver.cpp:170] Iteration 126, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:39.715533   169 solver.cpp:350] Iteration 132 (4.43985 iter/s, 1.3514s/6 iter), 2.5/5.1ep, loss = 0.0428367
+I0922 22:54:39.715567   169 solver.cpp:374]     Train net output #0: loss = 0.0428367 (* 1 = 0.0428367 loss)
+I0922 22:54:39.715577   169 sgd_solver.cpp:170] Iteration 132, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:40.057575   187 data_reader.cpp:320] Restarting data pre-fetching
+I0922 22:54:41.076719   169 solver.cpp:350] Iteration 138 (4.40798 iter/s, 1.36117s/6 iter), 2.6/5.1ep, loss = 0.0635544
+I0922 22:54:41.076761   169 solver.cpp:374]     Train net output #0: loss = 0.0635544 (* 1 = 0.0635544 loss)
+I0922 22:54:41.076776   169 sgd_solver.cpp:170] Iteration 138, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:42.430203   169 solver.cpp:350] Iteration 144 (4.43296 iter/s, 1.3535s/6 iter), 2.7/5.1ep, loss = 0.0526311
+I0922 22:54:42.430243   169 solver.cpp:374]     Train net output #0: loss = 0.0526311 (* 1 = 0.0526311 loss)
+I0922 22:54:42.430258   169 sgd_solver.cpp:170] Iteration 144, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:43.784382   169 solver.cpp:350] Iteration 150 (4.43075 iter/s, 1.35417s/6 iter), 2.8/5.1ep, loss = 0.0445697
+I0922 22:54:43.784415   169 solver.cpp:374]     Train net output #0: loss = 0.0445697 (* 1 = 0.0445697 loss)
+I0922 22:54:43.784425   169 sgd_solver.cpp:170] Iteration 150, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:45.135505   169 solver.cpp:350] Iteration 156 (4.4407 iter/s, 1.35114s/6 iter), 2.9/5.1ep, loss = 0.100095
+I0922 22:54:45.135537   169 solver.cpp:374]     Train net output #0: loss = 0.100095 (* 1 = 0.100095 loss)
+I0922 22:54:45.135548   169 sgd_solver.cpp:170] Iteration 156, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:46.264534   169 solver.cpp:782] Snapshotting to binary proto file snapshot_iter_162.caffemodel
+I0922 22:54:46.644986   169 sgd_solver.cpp:396] Snapshotting solver state to binary proto file snapshot_iter_162.solverstate
+I0922 22:54:46.815114   169 solver.cpp:516] Iteration 162, Testing net (#0)
+I0922 22:54:52.277930   179 data_reader.cpp:320] Restarting data pre-fetching
+I0922 22:54:52.487016   169 solver.cpp:602]     Test net output #0: accuracy = 0.979753
+I0922 22:54:52.487071   169 solver.cpp:602]     Test net output #1: loss = 0.0632717 (* 1 = 0.0632717 loss)
+I0922 22:54:52.487113   169 solver.cpp:281] Tests completed in 7.35175s
+I0922 22:54:52.710271   169 solver.cpp:350] Iteration 162 (0.816133 iter/s, 7.35175s/6 iter), 3/5.1ep, loss = 0.049823
+I0922 22:54:52.710301   169 solver.cpp:374]     Train net output #0: loss = 0.049823 (* 1 = 0.049823 loss)
+I0922 22:54:52.710311   169 sgd_solver.cpp:170] Iteration 162, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:54.058640   169 solver.cpp:350] Iteration 168 (4.44985 iter/s, 1.34836s/6 iter), 3.2/5.1ep, loss = 0.0390795
+I0922 22:54:54.058673   169 solver.cpp:374]     Train net output #0: loss = 0.0390795 (* 1 = 0.0390795 loss)
+I0922 22:54:54.058684   169 sgd_solver.cpp:170] Iteration 168, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:55.410562   169 solver.cpp:350] Iteration 174 (4.43808 iter/s, 1.35194s/6 iter), 3.3/5.1ep, loss = 0.0456418
+I0922 22:54:55.410593   169 solver.cpp:374]     Train net output #0: loss = 0.0456418 (* 1 = 0.0456418 loss)
+I0922 22:54:55.410604   169 sgd_solver.cpp:170] Iteration 174, lr = 0.001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:56.770025   169 solver.cpp:350] Iteration 180 (4.41354 iter/s, 1.35945s/6 iter), 3.4/5.1ep, loss = 0.00958169
+I0922 22:54:56.770059   169 solver.cpp:374]     Train net output #0: loss = 0.00958168 (* 1 = 0.00958168 loss)
+I0922 22:54:56.770069   169 sgd_solver.cpp:170] Iteration 180, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:57.912098   187 data_reader.cpp:320] Restarting data pre-fetching
+I0922 22:54:58.125809   169 solver.cpp:350] Iteration 186 (4.42545 iter/s, 1.3558s/6 iter), 3.5/5.1ep, loss = 0.116228
+I0922 22:54:58.125840   169 solver.cpp:374]     Train net output #0: loss = 0.116228 (* 1 = 0.116228 loss)
+I0922 22:54:58.125851   169 sgd_solver.cpp:170] Iteration 186, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:54:59.477591   169 solver.cpp:350] Iteration 192 (4.43853 iter/s, 1.3518s/6 iter), 3.6/5.1ep, loss = 0.0468642
+I0922 22:54:59.477622   169 solver.cpp:374]     Train net output #0: loss = 0.0468642 (* 1 = 0.0468642 loss)
+I0922 22:54:59.477632   169 sgd_solver.cpp:170] Iteration 192, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:55:00.832721   169 solver.cpp:350] Iteration 198 (4.42765 iter/s, 1.35512s/6 iter), 3.7/5.1ep, loss = 0.1129
+I0922 22:55:00.832756   169 solver.cpp:374]     Train net output #0: loss = 0.1129 (* 1 = 0.1129 loss)
+I0922 22:55:00.832767   169 sgd_solver.cpp:170] Iteration 198, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:55:02.199854   169 solver.cpp:350] Iteration 204 (4.38872 iter/s, 1.36714s/6 iter), 3.8/5.1ep, loss = 0.0393294
+I0922 22:55:02.199899   169 solver.cpp:374]     Train net output #0: loss = 0.0393294 (* 1 = 0.0393294 loss)
+I0922 22:55:02.199915   169 sgd_solver.cpp:170] Iteration 204, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:55:03.558951   169 solver.cpp:350] Iteration 210 (4.41463 iter/s, 1.35912s/6 iter), 3.9/5.1ep, loss = 0.0462831
+I0922 22:55:03.558984   169 solver.cpp:374]     Train net output #0: loss = 0.0462831 (* 1 = 0.0462831 loss)
+I0922 22:55:03.558993   169 sgd_solver.cpp:170] Iteration 210, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:55:04.688468   169 solver.cpp:782] Snapshotting to binary proto file snapshot_iter_216.caffemodel
+I0922 22:55:05.083106   169 sgd_solver.cpp:396] Snapshotting solver state to binary proto file snapshot_iter_216.solverstate
+I0922 22:55:05.267495   169 solver.cpp:516] Iteration 216, Testing net (#0)
+I0922 22:55:10.523510   179 data_reader.cpp:320] Restarting data pre-fetching
+I0922 22:55:10.733093   169 solver.cpp:602]     Test net output #0: accuracy = 0.982835
+I0922 22:55:10.733147   169 solver.cpp:602]     Test net output #1: loss = 0.0549053 (* 1 = 0.0549053 loss)
+I0922 22:55:10.733191   169 solver.cpp:281] Tests completed in 7.17437s
+I0922 22:55:10.959457   169 solver.cpp:350] Iteration 216 (0.83631 iter/s, 7.17437s/6 iter), 4.1/5.1ep, loss = 0.0420106
+I0922 22:55:10.959534   169 solver.cpp:374]     Train net output #0: loss = 0.0420106 (* 1 = 0.0420106 loss)
+I0922 22:55:10.959549   169 sgd_solver.cpp:170] Iteration 216, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:55:12.310783   169 solver.cpp:350] Iteration 222 (4.44002 iter/s, 1.35135s/6 iter), 4.2/5.1ep, loss = 0.0691491
+I0922 22:55:12.310817   169 solver.cpp:374]     Train net output #0: loss = 0.0691491 (* 1 = 0.0691491 loss)
+I0922 22:55:12.310827   169 sgd_solver.cpp:170] Iteration 222, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:55:13.667080   169 solver.cpp:350] Iteration 228 (4.42375 iter/s, 1.35632s/6 iter), 4.3/5.1ep, loss = 0.0609174
+I0922 22:55:13.667109   169 solver.cpp:374]     Train net output #0: loss = 0.0609174 (* 1 = 0.0609174 loss)
+I0922 22:55:13.667119   169 sgd_solver.cpp:170] Iteration 228, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:55:15.025614   169 solver.cpp:350] Iteration 234 (4.41657 iter/s, 1.35852s/6 iter), 4.4/5.1ep, loss = 0.0413248
+I0922 22:55:15.025650   169 solver.cpp:374]     Train net output #0: loss = 0.0413248 (* 1 = 0.0413248 loss)
+I0922 22:55:15.025661   169 sgd_solver.cpp:170] Iteration 234, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:55:16.149283   187 data_reader.cpp:320] Restarting data pre-fetching
+I0922 22:55:16.385094   169 solver.cpp:350] Iteration 240 (4.41341 iter/s, 1.35949s/6 iter), 4.5/5.1ep, loss = 0.101612
+I0922 22:55:16.385138   169 solver.cpp:374]     Train net output #0: loss = 0.101612 (* 1 = 0.101612 loss)
+I0922 22:55:16.385151   169 sgd_solver.cpp:170] Iteration 240, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:55:17.749086   169 solver.cpp:350] Iteration 246 (4.39895 iter/s, 1.36396s/6 iter), 4.6/5.1ep, loss = 0.0331025
+I0922 22:55:17.749146   169 solver.cpp:374]     Train net output #0: loss = 0.0331025 (* 1 = 0.0331025 loss)
+I0922 22:55:17.749166   169 sgd_solver.cpp:170] Iteration 246, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:55:19.111768   169 solver.cpp:350] Iteration 252 (4.40299 iter/s, 1.36271s/6 iter), 4.7/5.1ep, loss = 0.0765691
+I0922 22:55:19.111819   169 solver.cpp:374]     Train net output #0: loss = 0.0765691 (* 1 = 0.0765691 loss)
+I0922 22:55:19.111840   169 sgd_solver.cpp:170] Iteration 252, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:55:20.469128   169 solver.cpp:350] Iteration 258 (4.4203 iter/s, 1.35738s/6 iter), 4.8/5.1ep, loss = 0.0452711
+I0922 22:55:20.469161   169 solver.cpp:374]     Train net output #0: loss = 0.045271 (* 1 = 0.045271 loss)
+I0922 22:55:20.469172   169 sgd_solver.cpp:170] Iteration 258, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:55:21.827973   169 solver.cpp:350] Iteration 264 (4.41553 iter/s, 1.35884s/6 iter), 5/5.1ep, loss = 0.056839
+I0922 22:55:21.828006   169 solver.cpp:374]     Train net output #0: loss = 0.056839 (* 1 = 0.056839 loss)
+I0922 22:55:21.828016   169 sgd_solver.cpp:170] Iteration 264, lr = 0.0001, m = 0.9, wd = 0.0001, gs = 1
+I0922 22:55:22.961032   169 solver.cpp:350] Iteration 269 (4.4128 iter/s, 1.13307s/5 iter), 5.1/5.1ep, loss = 0.0546172
+I0922 22:55:22.961129   169 solver.cpp:374]     Train net output #0: loss = 0.0546172 (* 1 = 0.0546172 loss)
+I0922 22:55:22.961143   169 solver.cpp:782] Snapshotting to binary proto file snapshot_iter_270.caffemodel
+I0922 22:55:23.339468   169 sgd_solver.cpp:396] Snapshotting solver state to binary proto file snapshot_iter_270.solverstate
+I0922 22:55:23.596514   169 solver.cpp:481] Iteration 270, loss = 0.048542
+I0922 22:55:23.596554   169 solver.cpp:516] Iteration 270, Testing net (#0)
+I0922 22:55:29.024168   179 data_reader.cpp:320] Restarting data pre-fetching
+I0922 22:55:29.230301   169 solver.cpp:602]     Test net output #0: accuracy = 0.981074
+I0922 22:55:29.230355   169 solver.cpp:602]     Test net output #1: loss = 0.055697 (* 1 = 0.055697 loss)
+I0922 22:55:29.230386   169 caffe.cpp:264] Solver performance on device 0: 3.203 * 128 = 410 img/sec (270 itr in 83.66 sec)
+I0922 22:55:29.230404   169 caffe.cpp:267] Optimization Done in 1m 41s

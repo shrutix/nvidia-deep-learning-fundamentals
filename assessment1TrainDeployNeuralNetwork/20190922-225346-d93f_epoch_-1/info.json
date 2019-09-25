@@ -1,0 +1,27 @@
+{
+    "caffe flavor": "NVIDIA",
+    "caffe version": "0.17.0",
+    "creation time": "2019-09-22 22:53:46.475974",
+    "dataset_id": "20190922-225123-167e",
+    "deploy file": "deploy.prototxt",
+    "digits version": "6.1.1",
+    "framework": "caffe",
+    "id": "20190922-225346-d93f",
+    "image dimensions": [
+        256,
+        256,
+        3
+    ],
+    "image resize mode": "squash",
+    "job id": "20190922-225346-d93f",
+    "labels file": "labels.txt",
+    "mean file": "mean.binaryproto",
+    "mean subtraction": "image",
+    "model file": "original.prototxt",
+    "name": "WhaleFaceClassifier3",
+    "snapshot file": "snapshot_iter_270.caffemodel",
+    "solver file": "solver.prototxt",
+    "status": "Done",
+    "train_val file": "train_val.prototxt",
+    "username": "shrutij"
+}
